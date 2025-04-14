@@ -31,12 +31,14 @@ def get_song_recommendations(book_title, n=3, cosine_sim=cosine_sim):
     song_indices = [i[0] for i in sim_scores]
     return df['Song Name'].iloc[song_indices].tolist()
 
+# Extract book titles from the DataFrame
+books = books_df['Title'].tolist()
+
 # Streamlit UI
 st.title("Book to Song Recommender")
 
-# Search for book title with suggestions
+# Autocomplete-like search with text input
 book_title = st.text_input("Enter a book title", placeholder="Type to search books...")
-books = books_df['Title'].tolist()
 
 # Display suggestions
 if book_title:
@@ -53,16 +55,16 @@ if 'book_title' in st.session_state:
     book_title = st.session_state['book_title']
 
 # Number of recommendations
-num_recommendations = st.slider("Number of song recommendations", 1, 10, 3)
+num_recommendations = st.number_input("Number of recommendations", min_value=1, max_value=10, value=3, step=1)
 
 # Get recommendations
 if st.button("Get Recommendations"):
     if book_title:
         recommendations = get_song_recommendations(book_title, num_recommendations)
         if recommendations is None:
-            st.error(f"No songs found for '{book_title}'. Try another title.")
+            st.error("Book title not found. Please try another title.")
         else:
-            st.success(f"Song recommendations for '{book_title}':")
+            st.success(f"Recommendations for '{book_title}':")
             for i, song in enumerate(recommendations, 1):
                 st.write(f"{i}. {song}")
     else:
